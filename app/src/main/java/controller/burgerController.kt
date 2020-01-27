@@ -32,7 +32,7 @@ private var burgerServices = retrofit.create(BurgerServices::class.java)
 fun getAllBurgersController(context: Context){
     burgerServices.getAllBurgers().enqueue(object : Callback<List<Burger>>{
         override fun onResponse(call: Call<List<Burger>>, response: Response <List<Burger>>) {
-            val burgerListDao = App.db.BurgerListDao()
+            val burgerListDao = AppDatabase.getDatabase(context).BurgerListDao()
             Timber.d("Burger ==> %s",response.body().toString())
             Executors.newSingleThreadExecutor().execute {
                 burgerListDao.insertEvent(response.body()!!)
