@@ -1,26 +1,25 @@
 package training.archcomps.burger_agents_android
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import bdd.AppDatabase
 import controller.getAllBurgersController
 import kotlinx.android.synthetic.main.activity_main.*
 import model.Burger
 import model.BurgerViewModel
 import recyclerView.BurgerListAdapter
 import timber.log.Timber
-import java.util.concurrent.Executors
+import java.text.DecimalFormat
 
 class MainActivity : AppCompatActivity() , BurgerListAdapter.BurgerAdapterListener{
 
     private lateinit var viewModel: BurgerViewModel
-    private lateinit var burgerList: MutableList<Burger>
     private lateinit var burgerListAdapter : BurgerListAdapter
+    private var listRefBurger : ArrayList<String> = ArrayList()
+    private var totalPrice = 0.0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,6 +29,14 @@ class MainActivity : AppCompatActivity() , BurgerListAdapter.BurgerAdapterListen
         viewModel = ViewModelProviders.of(this).get(BurgerViewModel::class.java)
         viewModel.eventViewModel.observe(this, Observer { newBurgers -> fillBurgerList(newBurgers)})
 
+        validPanierButton.setOnClickListener { goBasket() }
+    }
+
+    private fun goBasket() {
+       val intent = Intent(this, BasketActivity::class.java)
+       intent.putStringArrayListExtra("LIST_REF_BURGER", listRefBurger)
+       intent.putExtra("TOTAL_PRICE", totalPrice)
+       startActivity(intent)
     }
 
     private fun fillBurgerList(newBurgers: MutableList<Burger>?) {
@@ -40,15 +47,21 @@ class MainActivity : AppCompatActivity() , BurgerListAdapter.BurgerAdapterListen
         }
     }
 
-    override fun onBurgerSelected(burger: Burger) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
     override fun addBurgerOnMenu(burger: Burger) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        totalPrice += burger.price / 100
+        listRefBurger.add(burger.ref)
+        setTotalPrice()
     }
 
     override fun removeBurgerFromMenu(burger: Burger) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        totalPrice -= burger.price / 100
+        listRefBurger.remove(burger.ref)
+        setTotalPrice()
+    }
+
+    fun setTotalPrice(){
+        val decimalFormatD = DecimalFormat("0.00")
+        when{ totalPrice < 0 -> totalPrice = 0.0}
+        totalPriceId.text = decimalFormatD.format(totalPrice)+" €"
     }
 }

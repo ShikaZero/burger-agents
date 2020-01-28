@@ -35,7 +35,7 @@ fun getAllBurgersController(context: Context){
             val burgerListDao = AppDatabase.getDatabase(context).BurgerListDao()
             Timber.d("Burger ==> %s",response.body().toString())
             Executors.newSingleThreadExecutor().execute {
-                burgerListDao.insertEvent(response.body()!!)
+                when{ response.body() != null -> burgerListDao.insertEvent(response.body()!!) }
             }
         }
         override fun onFailure(call: Call<List<Burger>>, t: Throwable) {

@@ -11,5 +11,6 @@ data class Burger (
     var title : String = "",
     var description :  String = "",
     var thumbnail : String = "",
-    var price : Double = 0.0
+    var price : Double = 0.0,
+    var panierId : Int = 0
 )
